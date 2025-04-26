@@ -1,0 +1,5 @@
+[[game]]
+
+[[jogador padrão]]
+
+[[roleta]]

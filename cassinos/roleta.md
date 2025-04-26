@@ -1,0 +1,1 @@
+essa classe é responsável por sortear um número 
