@@ -6,5 +6,5 @@ class Roleta:
 
     
     def girar(self):
-        sorteado = randint(0, 36)
+        sorteado = randint(0, 54)
         return sorteado 
