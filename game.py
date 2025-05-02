@@ -13,7 +13,7 @@ r1 = Roleta()
 a1 = Apostas()
 j1 = apostadorPadrao()
 
-for i in range(0,10):
+for i in range(0,300):
    
     print(f"saldo anterior: {j1.saldo:.2f}")
    
@@ -29,7 +29,10 @@ for i in range(0,10):
     
     print(f"saldo novo: {j1.saldo:.2f}")
 
-    
+    if(j1.saldo == 0):
+        print(f"saldo zerado em {i} rodadas")
+        break
+
     print("")
 
 print("============")

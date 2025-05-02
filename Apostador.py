@@ -5,10 +5,10 @@ class apostadorPadrao:
     historicoApostas =[]
     saldo = 0
 
-    def __init__(self, saldo = 1000, percentualApostado = 20):  
+    def __init__(self, saldo = 1000):  
         self.saldoInicial =saldo
         self.saldo = saldo
-        self.percentualApostado = percentualApostado
+        
   
 
 
@@ -17,20 +17,28 @@ class apostadorPadrao:
         self.historicoGanhos.append(premio)
 
     def apostaCega(self):
-        montanteAposta = int( self.saldo * self.percentualApostado/100)
-        self.saldo -= montanteAposta
+        montanteAposta = int(self.saldo)
 
-        x1 = montanteAposta/8
-        x2 = montanteAposta/8
-        x5 = montanteAposta/8
-        x10 = montanteAposta/8
-        azul = montanteAposta/8
-        rosa = montanteAposta/8
-        verde = montanteAposta/8
-        vermelho = montanteAposta/8
-        self.historicoApostas.append([x1,x2,x5,x10,azul,rosa,verde,vermelho])
+        # Se não houver saldo suficiente para dividir entre 8 categorias, aposta tudo em x1
+        if montanteAposta < 8 and montanteAposta >= 1:
+            x1 = montanteAposta
+            x2 = x5 = x10 = azul = rosa = verde = vermelho = 0
+            self.saldo -= montanteAposta
 
-        return x1,x2,x5,x10,azul,rosa,verde,vermelho
+        elif montanteAposta >= 8:
+            aposta_unitaria = montanteAposta // 8
+            x1 = x2 = x5 = x10 = azul = rosa = verde = vermelho = aposta_unitaria
+            total_apostado = aposta_unitaria * 8
+            self.saldo -= total_apostado
+        
+        else:
+            # Se nem 1 pode ser apostado, aposta tudo como 0
+            x1 = x2 = x5 = x10 = azul = rosa = verde = vermelho = 0
+
+        self.historicoApostas.append([x1, x2, x5, x10, azul, rosa, verde, vermelho])
+        return x1, x2, x5, x10, azul, rosa, verde, vermelho
+
+
     
     def exbirHistorico(self):
         print(f"apostas: {self.historicoApostas}")            
