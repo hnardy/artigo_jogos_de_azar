@@ -26,6 +26,8 @@ os mini games possuem bônus variáveis que teoricamente variam de 2 ~ 20 000 ve
 
 
 
+
+
 |numero premio|
 |1|X1|
 |2|X2|
@@ -34,6 +36,7 @@ os mini games possuem bônus variáveis que teoricamente variam de 2 ~ 20 000 ve
 |5|X2|
 |6|ROSA|
 |7|X1|
+
 |8|X5|
 |9|X1|
 |10|X2|
