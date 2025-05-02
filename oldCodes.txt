@@ -1,3 +1,5 @@
+gerar numeros
+
 #for x in range (0,10):   
 #    r1 = Roleta()
 #    i = r1.girar()
@@ -22,6 +24,89 @@
 #pago = a1.aposta(x1,x2,x5,x10,azul1,rosa,verde,vermelho,casa[0])
 #print(pago)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+testar tempo de falha
+
+for j in range(1,100):
+
+    r1 = Roleta()
+    a1 = Apostas()
+    j1 = apostadorPadrao()
+
+    for i in range(0,300):
+    
+      #  print(f"saldo anterior: {j1.saldo:.2f}")
+    
+        ap = j1.apostaCega()
+       # print(f"apostas: {ap}")
+
+        giro = r1.girar()
+        #print(f"sorteado:{giro}")
+
+        ad = a1.aposta(ap[0],ap[1],ap[2],ap[3],ap[4],ap[5],ap[6],ap[7],giro[0])
+        #print(f"premio: {ad}")
+        j1.receberPremio(ad)
+        
+       # print(f"saldo novo: {j1.saldo:.2f}")
+
+        if(j1.saldo == 0):
+            print(f"saldo zerado em {i} rodadas")
+            break
+
+
+
+
+
+
+
+
+
+
+
+simular 1 milhao de jogos
+
+for j in range(0, 1000000):
+
+    # Exibir progresso a cada 1%
+    if j % 10000 == 0:
+        os.system('cls')  
+        print(f'task {j // 10000}%')
+        print(f'tempo decorrido {time.time() - inicio:.2f}s')
+        
+
+    # Criar um novo apostador a cada simulação completa 
+    j1 = apostadorPadrao()
+
+    for i in range(0, 300):
+        r1 = Roleta()
+        a1 = Apostas()
+        
+        ap = j1.apostaCega()
+        giro = r1.girar()
+
+        
+        ad = a1.aposta(*ap, giro[0])  # Desempacotando as apostas
+        j1.receberPremio(ad)
+
+        if j1.saldo == 0:
+            tempoParaZerar.append(i)
+            break
 
 
 
