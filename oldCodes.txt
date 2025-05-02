@@ -1,0 +1,33 @@
+#for x in range (0,10):   
+#    r1 = Roleta()
+#    i = r1.girar()
+#    print(f'{i[0]} casa {i[1]}')
+#print(r1.getHistorico())
+
+
+# jogo manual
+# r1 = Roleta()
+#a1 = Apostas()
+#print("jogo")
+#x1 = int(input("valor da aposta em x1?"))
+#x2 = int(input("valor da aposta em x2?"))
+#x5 = int(input("valor da aposta em x5?"))
+#x10 = int(input("valor da aposta em x10?"))
+#azul = int(input("valor da aposta em azul?"))
+#rosa = int(input("valor da aposta em rosa?"))
+#verde = int(input("valor da aposta em verde?"))
+#vermelho = int(input("valor da aposta em vermelho?"))
+#casa = r1.girar()
+#print(f"casa {casa[1]} {casa[0]}")
+#pago = a1.aposta(x1,x2,x5,x10,azul1,rosa,verde,vermelho,casa[0])
+#print(pago)
+
+
+
+
+02/05/2025  02:26 
+criado classes apostas e apostador padrão 
+
+ainda devo fazer premios de cor 
+descobrir como criar jogadores em massa 
+

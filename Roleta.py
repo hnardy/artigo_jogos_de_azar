@@ -1,5 +1,8 @@
 from random import randint
 
+# a classe roleta escolhe um número e dita seu premio, apenas 
+
+
 # listas de prêmios e suas respectivas casas
 x1 = (1, 4, 7, 9, 11, 13, 15, 19, 21, 23, 25, 29, 31, 34, 37, 39, 41, 43, 46, 50, 53)
 x2 = (2, 5, 10, 14, 17, 20, 27, 32, 35, 44, 47, 49, 52)
@@ -20,38 +23,47 @@ class Roleta:
         premio = self.identificarCasa(sorteado)
         return premio,sorteado
 
-    def premioAzul(self):
-        return "prêmio azul"
-
-    def premioRosa(self):
-        return "prêmio rosa"
-
-    def premioVerde(self):
-        return "prêmio verde"
-
-    def premioVermelho(self):
-        return "prêmio vermelho"
-
-    def premioMultiplicar(self, fator):
-        return f"multiplicar por {fator}"
-
 
     def identificarCasa(self, num): 
         if num in x1:
-            return self.premioMultiplicar(1)
+            historicoPremios.append("1")
+            return "multiplicar por 1"
+        
         elif num in x2:
-            return self.premioMultiplicar(2)
+            historicoPremios.append("2")
+            return "multiplicar por 2"
+        
         elif num in x5:
-            return self.premioMultiplicar(5)
+            historicoPremios.append("5")
+            return"multiplicar por 5"
+        
         elif num in x10:
-            return self.premioMultiplicar(10)
+            historicoPremios.append("10")
+            return "multiplicar por 10"
+        
         elif num in azul:
-            return self.premioAzul()
+            historicoPremios.append(f"azul")
+            return "prêmio azul"
+        
         elif num in rosa:
-            return self.premioRosa()
+            historicoPremios.append(f"rosa")
+            return "prêmio rosa"
+        
         elif num in verde:
-            return self.premioVerde()
+            historicoPremios.append(f"verde")
+            return "prêmio verde"
+        
         elif num in vermelho:
-            return self.premioVermelho()
+            historicoPremios.append(f"vermelho")
+            return "prêmio vermelho"
+        
         else:
             return "erro"
+        
+
+
+
+
+
+    def getHistorico(self):
+        return historicoPremios
