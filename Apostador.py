@@ -1,49 +1,56 @@
 from random import randint
 
-
-
-#saldo do jogador
-#o jogador está ativo?
-# esquema de aposta [x1 x2 x5 x10 azul rosa verde vermelho]
-
-
+# Classe que representa um apostador com uma estratégia padrão.
+# Aposta em todas as categorias igualmente, se possível.
+# Mantém históricos de saldo, apostas e ganhos.
 
 class ApostadorPadrao:
-    
-    historicoGanhos = []
-    historicoApostas =[]
-    historicoSaldos = []
-    tipo = "padrão"
+    historicoGanhos = []      # Guarda todos os prêmios recebidos
+    historicoApostas = []     # Guarda todas as apostas realizadas
+    historicoSaldos = []      # Guarda o saldo antes de cada aposta
+    tipo = "padrão"           # Identificador do tipo de apostador
 
+    def __init__(self, saldo=100000):
+        """
+        Inicializa o jogador com um saldo definido.
 
-    def __init__(self, saldo = 100000):  
-        self.saldoInicial =saldo
+        Args:
+            saldo (int): saldo inicial do jogador (padrão 100000)
+        """
+        self.saldoInicial = saldo
         self.saldo = saldo
-        
 
     def estaAtivo(self):
-        if self.saldo > 0:
-            return True
-        else:
-            return False 
+        """
+        Verifica se o jogador ainda possui saldo.
 
+        Returns:
+            bool: True se o saldo for maior que 0, False caso contrário
+        """
+        return self.saldo > 0
 
+    def receberPremio(self, premio):
+        """
+        Atualiza o saldo do jogador com o valor do prêmio recebido e registra no histórico.
 
-    def receberPremio(self,premio):
+        Args:
+            premio (int): valor a ser adicionado ao saldo
+        """
         self.saldo += premio
         self.historicoGanhos.append(premio)
 
-
-
     def apostar(self):
+        """
+        Realiza uma aposta com parte do saldo disponível, dividindo igualmente entre as categorias,
+        se possível. Se o saldo for menor que 8, aposta tudo em x1.
 
+        Returns:
+            tuple: valores apostados em cada categoria
+        """
         self.historicoSaldos.append(self.saldo)
-        
-        montanteAposta = randint(1,int(self.saldo))
+        montanteAposta = randint(1, int(self.saldo))
 
-
-        # Se não houver saldo suficiente para dividir entre 8 categorias, aposta tudo em x1
-        if montanteAposta < 8 and montanteAposta >= 1:
+        if 1 <= montanteAposta < 8:
             x1 = montanteAposta
             x2 = x5 = x10 = azul = rosa = verde = vermelho = 0
             self.saldo -= montanteAposta
@@ -53,20 +60,20 @@ class ApostadorPadrao:
             x1 = x2 = x5 = x10 = azul = rosa = verde = vermelho = aposta_unitaria
             total_apostado = aposta_unitaria * 8
             self.saldo -= total_apostado
-        
+
         else:
-            # Se nem 1 pode ser apostado, aposta tudo como 0
+            # Aposta nula se o saldo não permite nem 1 de aposta
             x1 = x2 = x5 = x10 = azul = rosa = verde = vermelho = 0
 
-
         self.historicoApostas.append([x1, x2, x5, x10, azul, rosa, verde, vermelho])
-        
-
         return x1, x2, x5, x10, azul, rosa, verde, vermelho
 
-
     def rodadasAteFalha(self):
-        a = len(self.historicoApostas)
-        return a
-    
+        """
+        Retorna o número de apostas realizadas, que corresponde ao número de rodadas jogadas
+        até o jogador falhar (quebrar).
 
+        Returns:
+            int: número de rodadas até o jogador ficar sem saldo
+        """
+        return len(self.historicoApostas)

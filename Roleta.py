@@ -1,9 +1,8 @@
 from random import randint
 
-# a classe roleta escolhe um número e dita seu premio, apenas 
+# A classe Roleta escolhe aleatoriamente um número e retorna seu prêmio correspondente.
 
-
-# listas de prêmios e suas respectivas casas
+# Listas de prêmios e suas respectivas casas
 x1 = (1, 4, 7, 9, 11, 13, 15, 19, 21, 23, 25, 29, 31, 34, 37, 39, 41, 43, 46, 50, 53)
 x2 = (2, 5, 10, 14, 17, 20, 27, 32, 35, 44, 47, 49, 52)
 x5 = (3, 8, 22, 26, 33, 40, 45)
@@ -12,19 +11,37 @@ azul = (12, 24, 36, 48)
 rosa = (6, 30)
 verde = (18, 42)
 vermelho = (54,)
-historicoPremios = []
+
+historicoPremios = []  # Histórico de todos os prêmios sorteados
+
 
 class Roleta:
-    def __init__(self):  
+    def __init__(self):
+        """Inicializa a roleta."""
         pass
 
     def girar(self):
+        """
+        Sorteia um número aleatório de 1 a 54 e identifica seu prêmio.
+        
+        Returns:
+            tuple: (nome do prêmio, número sorteado)
+        """
         sorteado = randint(1, 54)
         premio = self.identificarCasa(sorteado)
-        return premio,sorteado
+        return premio, sorteado
 
+    def identificarCasa(self, num):
+        """
+        Identifica qual é o prêmio correspondente ao número sorteado.
+        Também atualiza o histórico de prêmios.
 
-    def identificarCasa(self, num): 
+        Args:
+            num (int): número sorteado pela roleta
+
+        Returns:
+            str: nome do prêmio correspondente
+        """
         if num in x1:
             historicoPremios.append("1")
             return "multiplicar por 1"
@@ -35,35 +52,36 @@ class Roleta:
         
         elif num in x5:
             historicoPremios.append("5")
-            return"multiplicar por 5"
+            return "multiplicar por 5"
         
         elif num in x10:
             historicoPremios.append("10")
             return "multiplicar por 10"
         
         elif num in azul:
-            historicoPremios.append(f"azul")
+            historicoPremios.append("azul")
             return "prêmio azul"
         
         elif num in rosa:
-            historicoPremios.append(f"rosa")
+            historicoPremios.append("rosa")
             return "prêmio rosa"
         
         elif num in verde:
-            historicoPremios.append(f"verde")
+            historicoPremios.append("verde")
             return "prêmio verde"
         
         elif num in vermelho:
-            historicoPremios.append(f"vermelho")
+            historicoPremios.append("vermelho")
             return "prêmio vermelho"
         
         else:
             return "erro"
-        
-
-
-
-
 
     def getHistorico(self):
+        """
+        Retorna a lista com o histórico dos prêmios sorteados.
+
+        Returns:
+            list: lista de strings com prêmios anteriores
+        """
         return historicoPremios
