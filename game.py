@@ -2,70 +2,103 @@ from Roleta import Roleta
 from Apostas import Apostas
 from Apostador import *
 from Graficos import *
+from Casa import *
 import time 
 import os
 
-os.system('cls') #limpa o teminal no inicio da execução
 
-inicio = time.time()
+def limparTerminal():
+    os.system('cls') #limpa o teminal no inicio da execução
 
 
-r1 = Roleta()
-a1 = Apostas()
-j1 = apostadorPadrao()
-g1 = Graficos()
-g2 = Graficos()
-taskbar=0
-tempoParaZerar = []
-import os
-import time
+#inicia timer da execução
+inicio = time.time() 
 
-tempoParaZerar = []
-saldos = []
+#limpar terminal para nova execução
+limparTerminal() 
 
-iteracoes = 1000
+#iniciar objetos
+r1 = Roleta()  #sorteia números 
+a1 = Apostas() #processa apostas 
+j1 = ApostadorPadrao() # realiza apostas 
+c1 = Casa() #simula a banca da casa 
+#e1 = Estatisticas() #armazena e processa dados  
 
+#controle de progresso 
+taskbar=0 # progresso da execução 
+
+#controles de jogo
+iteracoes = 1 # quantidade de jogos (1 por padrão )
+numJogadores = 100 #quantidade de jogadores 
+
+
+#historico de jogadores ativos armazena [iteração, ativos]
+historicoJogadoresAtivos = []
+
+
+#quantidade de iterações
 for j in range(0, iteracoes):
 
     # Exibir progresso a cada 1%
-    if j % (iteracoes/100) == 0:
-        os.system('cls')  
+    if j % (iteracoes/100) == 0:  
         print(f'task {j // (iteracoes/100):.0f}%')
         print(f'tempo decorrido {time.time() - inicio:.2f}s')
         
 
-    j1 = apostadorPadrao()
-    minisaldo = []   
-    for i in range(0,300):
-    
+
+
+
+    #definir jogadores 
+    jogadores = []
+    for j in range  (0,numJogadores):
+        #aqui devem ser implementadas diferentes estratégias 
+        jogadores.append(ApostadorPadrao())
+
+
+
+    #inciar jogos
+    for i in range(0,300): #300 é um número de segurança para evitar estratégias imortais
+        #listar jogadores ativos 
+        jogadoresAtivos = []
+        for at in jogadores:
+            if at.estaAtivo():  
+                jogadoresAtivos.append(at) #apenas jogadores ativos faram apostas
         
-        minisaldo.append(j1.saldo)
-      #  print(f"saldo anterior: {j1.saldo:.2f}")
-    
-        ap = j1.apostaCega()
-       # print(f"apostas: {ap}")
-
-        giro = r1.girar()
-        #print(f"sorteado:{giro}")
-
-        ad = a1.aposta(ap[0],ap[1],ap[2],ap[3],ap[4],ap[5],ap[6],ap[7],giro[0])
-        #print(f"premio: {ad}")
-        j1.receberPremio(ad)
         
-       # print(f"saldo novo: {j1.saldo:.2f}")
-
-        if(j1.saldo == 0):
-            saldos.append(minisaldo)
+        #se não houver jogadores ativos
+        if jogadoresAtivos == []:
+        #   print ("sem jogadores ativos")
             break
 
+        #apostar
+        apostados = [] #recebe as apostados dos jogares ativos
+        
+        for player in jogadoresAtivos:
+            ap = player.apostar() #o jogador faz a aposta
+            apostados.append((player,ap)) #guardados os dados do jogador e aposta feita [jogador, [x1 x2 x5 x10 azul rosa verde vermelho ]]
+
+        #sortear
+        giro = r1.girar() 
+    
+        #conferir e pagar
+
+        for player, ap in apostados:
+            c1.receberApostas(sum(ap)) #informa a casa de apostas quanto ela recebeu do jogador
+
+            player.receberPremio(a1.aposta(*ap, giro[0])) # paga o jogador 
+                                                          #"giro" armazena tanto o tipo de premio quanto a casa, por isso giro[0]
+            c1.pagarPremio(a1.aposta(*ap, giro[0])) #informa a casa de aposta quanto ela pagou ao jogador
+        
+
+    #exportar dados 
+    #ao final da iteração os dados são exportados e os jogadores deletados 
+
+    
 
 
-print("============")
-
-print(saldos)
 
 
-g1.linhas(saldos)
+
 
 
 
@@ -75,6 +108,9 @@ g1.linhas(saldos)
 fim =  time.time() - inicio
 print(f" tempo de execução {fim:.2f} segundos")
 print ("finalizado")
+
+
+
 
 
 

@@ -110,6 +110,37 @@ for j in range(0, 1000000):
 
 
 
+
+
+
+    j1 = ApostadorPadrao() # redefine jogador 
+
+    for i in range(0,300):
+    
+    
+
+        #apostar
+    
+        ap = j1.apostaCega()
+
+        #sortear
+    
+        giro = r1.girar()
+
+        #pagar
+    
+        ad = a1.aposta(ap[0],ap[1],ap[2],ap[3],ap[4],ap[5],ap[6],ap[7],giro[0])
+        j1.receberPremio(ad)
+
+        #em caso do jogador quebrar    
+        if(j1.saldo == 0):
+            break
+
+
+
+
+
+
 02/05/2025  02:26 
 criado classes apostas e apostador padrão 
 

@@ -1,18 +1,32 @@
 from random import randint
 
-class apostadorPadrao:
+
+
+#saldo do jogador
+#o jogador está ativo?
+# esquema de aposta [x1 x2 x5 x10 azul rosa verde vermelho]
+
+
+
+class ApostadorPadrao:
     
     historicoGanhos = []
     historicoApostas =[]
     historicoSaldos = []
+    tipo = "padrão"
 
-    saldo = 0
 
-    def __init__(self, saldo = 10):  
+    def __init__(self, saldo = 100000):  
         self.saldoInicial =saldo
         self.saldo = saldo
         
-  
+
+    def estaAtivo(self):
+        if self.saldo > 0:
+            return True
+        else:
+            return False 
+
 
 
     def receberPremio(self,premio):
@@ -21,10 +35,12 @@ class apostadorPadrao:
 
 
 
-    def apostaCega(self):
+    def apostar(self):
 
         self.historicoSaldos.append(self.saldo)
-        montanteAposta = randint(0,int(self.saldo))
+        
+        montanteAposta = randint(1,int(self.saldo))
+
 
         # Se não houver saldo suficiente para dividir entre 8 categorias, aposta tudo em x1
         if montanteAposta < 8 and montanteAposta >= 1:
@@ -49,11 +65,8 @@ class apostadorPadrao:
         return x1, x2, x5, x10, azul, rosa, verde, vermelho
 
 
-
-
+    def rodadasAteFalha(self):
+        a = len(self.historicoApostas)
+        return a
     
-    def exbirHistorico(self):
-        print(f"apostas: {self.historicoApostas}")            
-        print(f"ganhos: {self.historicoGanhos}")
-        print(f"saldos:{self.historicoSaldos}")
-        print(f"saldo Atual: {self.saldo}")
+

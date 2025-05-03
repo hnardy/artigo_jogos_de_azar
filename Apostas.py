@@ -27,7 +27,7 @@ class Apostas:
             return premio
         
         elif sorteado == ("prêmio azul"):
-            premio = azul + azul*9
+            premio = azul + azul*15
             return premio
         
         elif sorteado == ("prêmio rosa"):
@@ -35,7 +35,7 @@ class Apostas:
             return premio
         
         elif sorteado == ("prêmio verde"):
-            premio = verde + verde*20
+            premio = verde + verde*30
             return premio
         
         elif sorteado == ("prêmio vermelho"):
