@@ -1,7 +1,6 @@
 from Roleta import *
 from Apostas import *
 from Apostador import *
-from Graficos import *
 from Casa import *
 from Estatisticas import *
 import time 
@@ -45,6 +44,7 @@ for j in range(0, iteracoes):
     for j in range(0, numJogadores):
         # aqui devem ser implementadas diferentes estratégias 
         jogadores.append(ApostadorPadrao())
+        jogadores.append(ApostadorCalculista())
 
     # iniciar jogos
     for i in range(0, 300):  # 300 é um número de segurança para evitar estratégias imortais
@@ -89,16 +89,14 @@ for j in range(0, iteracoes):
         }
 
         # Passa os dados coletados para a classe Estatisticas
-        e1.coletarDados(dados_iteracao)
+        e1.coletarDados(dados_iteracao, jogadores)
+
 
     # Exportar dados ao final da iteração
     # Após coletar todos os dados ao longo das iterações, gerar gráficos ou relatórios
 
-    e1.gerarRelatorio()  # Gera um relatório das estatísticas coletadas
-    e1.gerarGraficoSaldos()  # Gera o gráfico de saldos dos jogadores
-    e1.gerarGraficoApostas()  # Gera o gráfico de apostas feitas
-    e1.gerarGraficoPremios()  # Gera o gráfico de prêmios pagos
 
+e1.exportarCSV(nome_arquivo="relatório")    
 # Finalizar programa
 fim = time.time() - inicio
 print(f"tempo de execução {fim:.2f} segundos")

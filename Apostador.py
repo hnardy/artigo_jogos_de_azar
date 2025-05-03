@@ -5,10 +5,7 @@ from random import randint
 # Mantém históricos de saldo, apostas e ganhos.
 
 class ApostadorPadrao:
-    historicoGanhos = []      # Guarda todos os prêmios recebidos
-    historicoApostas = []     # Guarda todas as apostas realizadas
-    historicoSaldos = []      # Guarda o saldo antes de cada aposta
-    tipo = "padrão"           # Identificador do tipo de apostador
+  
 
     def __init__(self, saldo=100000):
         """
@@ -17,6 +14,14 @@ class ApostadorPadrao:
         Args:
             saldo (int): saldo inicial do jogador (padrão 100000)
         """
+
+        self.historicoGanhos = []      # Guarda todos os prêmios recebidos
+        self.historicoApostas = []     # Guarda todas as apostas realizadas
+        self.historicoSaldos = []      # Guarda o saldo antes de cada aposta
+        self.tipo = "padrão"           # Identificador do tipo de apostador
+
+
+
         self.saldoInicial = saldo
         self.saldo = saldo
 
@@ -77,3 +82,45 @@ class ApostadorPadrao:
             int: número de rodadas até o jogador ficar sem saldo
         """
         return len(self.historicoApostas)
+
+
+class ApostadorCalculista(ApostadorPadrao):
+    tipo = "calculista"
+
+    def __init__(self, saldo=100000):
+        super().__init__(saldo)
+
+    def apostar(self):
+        """
+        Realiza uma aposta baseada em um cálculo de probabilidade.
+        Aposta mais em categorias com maiores retornos esperados.
+        """
+        self.historicoSaldos.append(self.saldo)
+        montanteAposta = randint(1, int(self.saldo))
+        
+        if montanteAposta < 8:
+            # Apostando com um critério de segurança
+            x1 = montanteAposta
+            x2 = x5 = x10 = azul = rosa = verde = vermelho = 0
+            self.saldo -= montanteAposta
+        else:
+            # Estratégia de apostas baseadas em cálculos de retornos
+            aposta_x10 = montanteAposta // 5
+            aposta_x5 = aposta_x10 // 2
+            aposta_x1 = (montanteAposta - (aposta_x10 + aposta_x5)) // 2
+            aposta_unitaria = (montanteAposta - (aposta_x10 + aposta_x5 + aposta_x1)) // 4
+
+            x1 = aposta_x1
+            x2 = aposta_unitaria
+            x5 = aposta_x5
+            x10 = aposta_x10
+            azul = aposta_unitaria
+            rosa = aposta_unitaria
+            verde = aposta_unitaria
+            vermelho = aposta_unitaria
+
+            total_apostado = x1 + x2 + x5 + x10 + azul + rosa + verde + vermelho
+            self.saldo -= total_apostado
+
+        self.historicoApostas.append([x1, x2, x5, x10, azul, rosa, verde, vermelho])
+        return x1, x2, x5, x10, azul, rosa, verde, vermelho
