@@ -6,36 +6,57 @@ from Casa import *
 from Estatisticas import *
 import time 
 import os
+import sys
+import keyboard
+
+
+def reset():
+    limparTerminal()
+    python = sys.executable
+    script_path = os.path.join(os.path.dirname(__file__), 'game.py')  # caminho absoluto para 'game.py'
+    os.execl(python, python, script_path)  # reinicia com 'game.py'
+
+# Finalizar programa
+def finalizar():
+    fim = time.time() - inicio
+    print(f"tempo de execução {fim:.2f} segundos")
+    print("finalizado")        
+    sys.exit()
+
 
 def limparTerminal():
     os.system('cls')  # limpa o terminal no início da execução
 
+# Atalho para reiniciar
+keyboard.add_hotkey('space', reset)
+keyboard.add_hotkey('esc', finalizar)
+
+
 # inicia o timer da execução
 inicio = time.time()
-
-# limpar terminal para nova execução
 limparTerminal()
+
 
 # iniciar objetos
 r1 = Roleta()  # sorteia números
 a1 = Apostas()  # processa apostas
-j1 = ApostadorPadrao()  # realiza apostas
 c1 = Casa()  # simula a banca da casa
 e1 = Estatisticas()  # armazena e processa dados
 
+
 # controle de progresso
-taskbar = 0  # progresso da execução
+#taskbar = 0  # progresso da execução (para debug)
 
 # controles de jogo
 iteracoes = 1  # quantidade de jogos (1 por padrão)
-numJogadores = 2  # quantidade de jogadores
+numJogadores = 1              # quantidade de jogadores
 rodadas = 300 #quantidade de jogos
 # histórico de jogadores ativos armazena [iteração, ativos]
 historicoJogadoresAtivos = []
 
 # quantidade de iterações
 for j in range(0, iteracoes):
-
+     
     # Exibir progresso a cada 1% (para debug)
     #if j % (iteracoes / 100) == 0:  
     #    print(f'task {j // (iteracoes / 100):.0f}%')
@@ -46,6 +67,8 @@ for j in range(0, iteracoes):
     for j in range(0, numJogadores):
         # aqui devem ser implementadas diferentes estratégias 
         jogadores.append(ApostadorPadrao())
+        jogadores.append(apostadorAleatorio())
+        jogadores.append(ApostadorEstrategia25())
 
     # iniciar jogos
     for i in range(0, rodadas):  # 300 é um número de segurança para evitar estratégias imortais
@@ -85,6 +108,7 @@ for j in range(0, iteracoes):
     # Exportar dados ao final da iteração
     e1.coletarDados(jogadores,c1,r1)
 
+    e1.GraficoSaldosCasaJogador()
     # Após coletar todos os dados ao longo das iterações, gerar gráficos ou relatórios
 
 
@@ -94,16 +118,10 @@ for j in range(0, iteracoes):
 
 
 
+finalizar()
 
 
 
 
 
-# Finalizar programa
-fim = time.time() - inicio
-print(f"tempo de execução {fim:.2f} segundos")
-print("finalizado")
 
-# Notas:
-# - Jogadores apostam -> número sorteado -> prêmio pago
-# - Banca da casa, central de gráficos, multiplicidade de jogadores

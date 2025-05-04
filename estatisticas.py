@@ -17,7 +17,7 @@ class Estatisticas(Graficos):
         self.rodadasVivoJogador = []  # Armazena quantas rodadas cada jogador participou
         self.historicoTotalApostajogador = []  # Armazena o total de apostas feitas por cada jogador
         pass
-
+        
     def coletarDados(self, jogadores, casa, roleta):
         """
         Método para coletar e organizar os dados do jogo, incluindo informações sobre os jogadores, a casa e a roleta.
@@ -59,19 +59,14 @@ class Estatisticas(Graficos):
             self.historicoTotalApostajogador.append([f'player{i}', valoresApostasSomados])
 
 
+    def GraficoSaldosCasaJogador(self):
 
-        # Aqui, os dados de saldos dos jogadores e da casa são combinados para exibição
-        # Garantimos que a casa seja adicionada de forma que tenha o mesmo formato dos jogadores.
-        # Cada jogador e a casa são apresentados como uma lista onde o primeiro valor é o nome (player0, player1, etc.), 
-        # e o segundo valor é a lista de saldos históricos.
-        
-        print(f"saldos casa {self.historicoSaldosCasa}")
-        
-        
-        saldos_combinados = self.historicoSaldosJogador + [['casa', self.historicoSaldosCasa]]
-
-        # Imprime a lista combinada para depuração
-        #print(saldos_combinados)  # Isso ajudará a verificar se os dados estão corretos.
-
-        # Passa a lista combinada para o método 'linhas()' para gerar o gráfico
-        self.linhas(saldos_combinados)  # Chama o método 'linhas()' para gerar o gráfico com os saldos combinados
+        if self.historicoSaldosJogador == []:
+            print("sem dados")
+            
+            return
+        else:
+            print(f"self.tiposJogadores: {self.tiposJogadores}")
+            saldos_combinados = self.historicoSaldosJogador + [['casa', self.historicoSaldosCasa]]
+            self.linhas(saldos_combinados,"histórico de saldos casa e jogadores")  
+            return
