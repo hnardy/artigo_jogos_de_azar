@@ -28,7 +28,7 @@ taskbar = 0  # progresso da execução
 
 # controles de jogo
 iteracoes = 1  # quantidade de jogos (1 por padrão)
-numJogadores = 5  # quantidade de jogadores
+numJogadores = 2  # quantidade de jogadores
 rodadas = 300 #quantidade de jogos
 # histórico de jogadores ativos armazena [iteração, ativos]
 historicoJogadoresAtivos = []

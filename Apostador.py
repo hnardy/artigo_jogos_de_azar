@@ -7,7 +7,7 @@ from random import randint
 class ApostadorPadrao:
   
 
-    def __init__(self, saldo=1000):
+    def __init__(self, saldo=100):
         """
         Inicializa o jogador com um saldo definido.
 
