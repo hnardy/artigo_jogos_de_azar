@@ -1,231 +1,77 @@
 import csv
-import matplotlib.pyplot as plt
-from collections import Counter
+from Graficos import *  # Importa o módulo de gráficos 
 
-class Estatisticas:
+class Estatisticas(Graficos):
     def __init__(self):
-        """
-        Inicializa a classe de estatísticas.
-        Contém listas para armazenar os dados coletados de cada iteração do jogo.
-        """
-        self.historicoPremios = []           # Todos os prêmios sorteados
-        self.historicoDeSorteios = []       # Números sorteados
-        self.historicoGanhos = []           # Ganhos individuais dos jogadores
-        self.historicoApostas = []          # Apostas feitas pelos jogadores
-        self.historicoSaldos = {}           # Saldos por tipo de apostador: {tipo: [saldos...]}
-        self.rodadasAteFalha = {}           # Rodadas até falha por tipo de apostador: {tipo: [rodadas...]}
-        self.valorApostasRecebidas = []     # Valores totais apostados
-        self.valorPremiosPagos = []         # Valores totais pagos em prêmios
-        self.historicoJogadoresAtivos = []  # Quantidade de jogadores ativos por rodada
+        # Inicializa listas que armazenam informações históricas sobre o jogo.
+        self.historicoPremios = []  # Armazena os prêmios pagos ao longo do tempo
+        self.valorApostasRecebidas = []  # Armazena os valores das apostas recebidas pela casa
+        self.valorPremiosPagos = []  # Armazena os prêmios pagos pela casa
+        self.historicoSaldosCasa = []  # Armazena o histórico de saldos da casa
 
-    def coletarDados(self, dados, jogadores):
-        """
-        Coleta os dados das outras classes e armazena nas listas.
+        # Listas específicas para informações sobre os jogadores
+        self.tiposJogadores = []  # Armazena o tipo de cada jogador (provavelmente do tipo "Jogador" ou "Bot")
+        self.historicoGanhosJogador = []  # Armazena os ganhos históricos de cada jogador
+        self.historicoApostasJogador = []  # Armazena as apostas históricas de cada jogador
+        self.historicoSaldosJogador = []  # Armazena os saldos históricos de cada jogador
+        self.rodadasVivoJogador = []  # Armazena quantas rodadas cada jogador participou
+        self.historicoTotalApostajogador = []  # Armazena o total de apostas feitas por cada jogador
+        pass
 
+    def coletarDados(self, jogadores, casa, roleta):
+        """
+        Método para coletar e organizar os dados do jogo, incluindo informações sobre os jogadores, a casa e a roleta.
+        
         Args:
-            dados (dict): Dicionário com chaves:
-                'historicoPremios', 'historicoDeSorteios', 'historicoGanhos',
-                'historicoApostas', 'valorApostasRecebidas', 'valorPremiosPagos',
-                'historicoJogadoresAtivos'
-            jogadores (list): lista de objetos de jogador utilizados nesta iteração.
+            jogadores (list): Lista de objetos jogadores.
+            casa (object): Objeto que representa a casa do jogo, com saldos e valores de apostas.
+            roleta (object): Objeto que contém o histórico de prêmios pagos pela roleta.
         """
-        self.historicoPremios.extend(dados['historicoPremios'])
-        self.historicoDeSorteios.extend(dados['historicoDeSorteios'])
-        self.historicoGanhos.extend(dados['historicoGanhos'])
-        self.historicoApostas.extend(dados['historicoApostas'])
-        self.valorApostasRecebidas.extend(dados['valorApostasRecebidas'])
-        self.valorPremiosPagos.extend(dados['valorPremiosPagos'])
-        self.historicoJogadoresAtivos.extend(dados['historicoJogadoresAtivos'])
+        
+        self.jogadores = jogadores  # Armazena os jogadores
+        self.casa = casa  # Armazena a casa
+        self.roleta = roleta  # Armazena a roleta
 
-        # Agrupa saldos e rodadas por tipo de apostador
-        for j in jogadores:
-            tipo = j.tipo
-            # Inicializa listas se não existirem
-            self.historicoSaldos.setdefault(tipo, []).append(j.saldo)
-            self.rodadasAteFalha.setdefault(tipo, []).append(j.rodadasAteFalha())
+        # Extende os históricos com as informações recebidas dos objetos (roleta e casa)
+        self.historicoPremios.extend(self.roleta.historicoPremios)
+        self.valorApostasRecebidas.extend(self.casa.valorApostasRecebidas)
+        self.valorPremiosPagos.extend(self.casa.valorPremiosPagos)
+        self.historicoSaldosCasa.extend(self.casa.historicoDeSaldos)
 
-    def gerarRelatorio(self):
-        """
-        Gera um relatório resumido das estatísticas coletadas.
-        """
-        total_apostas = sum(self.valorApostasRecebidas)
-        total_premios = sum(self.valorPremiosPagos)
-        saldo_geral = sum([sum(lst) for lst in self.historicoSaldos.values()])
-        num_entradas = sum([len(lst) for lst in self.historicoSaldos.values()])
-        media_saldo = saldo_geral/num_entradas if num_entradas else 0
+        # Loop para coletar e organizar os dados de cada jogador
+        for i, k in enumerate(self.jogadores):
+            # Adiciona o tipo de jogador à lista 'tiposJogadores'
+            self.tiposJogadores.append([f"player{i}", k.tipo])
+            
 
-        print("===== RELATÓRIO GERAL =====")
-        print(f"Total Apostas Recebidas: {total_apostas}")
-        print(f"Total Prêmios Pagos: {total_premios}")
-        print(f"Saldo Médio dos Jogadores: {media_saldo:.2f}")
+            # Adiciona os históricos de ganhos, apostas e saldos de cada jogador
+            self.historicoGanhosJogador.append([f'player{i}', k.historicoGanhos])   
+            self.historicoApostasJogador.append([f'player{i}', k.historicoApostas])
+            self.historicoSaldosJogador.append([f'player{i}', k.historicoSaldos]) 
+          
 
-        # Ranking de quem foi mais longe
-        distancias = {tipo: max(rodadas) for tipo, rodadas in self.rodadasAteFalha.items()}
-        ranking = sorted(distancias.items(), key=lambda x: x[1], reverse=True)
-        print("\nRanking de Apostadores por Maior Número de Rodadas: ")
-        for tipo, rodadas in ranking:
-            print(f" - {tipo}: {rodadas} rodadas")
-        print("===========================\n")
+            # Adiciona a quantidade de rodadas que o jogador esteve ativo
+            self.rodadasVivoJogador.append([f'player{i}', len(k.historicoApostas)])  
+            
 
-    def gerarGraficoBarras(self, data_dict, titulo, xlabel, ylabel):
-        """
-        Gera um gráfico de barras legível, exibindo o valor de cada barra no topo.
-
-        Args:
-            data_dict (dict): mapeia categorias a valores numéricos
-            titulo (str): título do gráfico
-            xlabel (str): rótulo do eixo X
-            ylabel (str): rótulo do eixo Y
-        """
-        categorias = list(data_dict.keys())
-        valores = list(data_dict.values())
-
-        plt.figure(figsize=(10, 6))
-        barras = plt.bar(categorias, valores, edgecolor='black', alpha=0.8)
-        plt.title(titulo, fontsize=14)
-        plt.xlabel(xlabel, fontsize=12)
-        plt.ylabel(ylabel, fontsize=12)
-        plt.grid(axis='y', linestyle='--', alpha=0.4)
-
-        # Escrever valor de cada barra no topo
-        for bar in barras:
-            altura = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2, altura, f'{altura}',
-                     ha='center', va='bottom', fontsize=10)
-
-        plt.tight_layout()
-        plt.show()
-
-    def gerarGraficoSaldosPorTipo(self):
-        """
-        Gera um gráfico de barras mostrando o saldo médio final por tipo de apostador.
-        """
-        media_saldos = {tipo: (sum(lst)/len(lst)) for tipo, lst in self.historicoSaldos.items()}
-        self.gerarGraficoBarras(media_saldos,
-                                "Saldo Médio Final por Tipo de Apostador",
-                                "Tipo de Apostador", "Saldo Médio")
-
-    def gerarGraficoRodadasPorTipo(self):
-        """
-        Gera um gráfico de barras com a maior quantidade de rodadas alcançadas por cada tipo de apostador.
-        """
-        max_rodadas = {tipo: max(lst) for tipo, lst in self.rodadasAteFalha.items()}
-        self.gerarGraficoBarras(max_rodadas,
-                                "Maior Rodadas por Tipo de Apostador",
-                                "Tipo de Apostador", "Rodadas")
-
-    def gerarGraficoDistribuicaoPremios(self):
-        """
-        Gera um histograma discreto da distribuição de prêmios sorteados.
-        """
-        self.gerarGraficoBarras(Counter(self.historicoPremios),
-                                "Distribuição de Prêmios Sorteados",
-                                "Prêmio", "Frequência")
-
-    def gerarGraficoDistribuicaoApostas(self):
-        """
-        Gera um histograma da distribuição dos valores apostados.
-        """
-        apostas_tot = [sum(ap) for ap in self.historicoApostas]
-        self.histograma(apostas_tot, passo_y=max(apostas_tot)//10 or 1,
-                        nome="Distribuição de Valores Apostados")
-
-    def histograma(self, dados, passo_y=5000, nome="histograma discreto"):
-        """
-        Gera um histograma discreto baseado nos dados fornecidos.
-
-        Args:
-            dados (list[int]): Lista de dados a serem plotados.
-            passo_y (int): Intervalo de unidades no eixo Y.
-            nome (str): Título do gráfico.
-        """
-        contagem = Counter(dados)
-        x = sorted(contagem.keys())
-        y = [contagem[val] for val in x]
-
-        plt.figure(figsize=(12, 6))
-        barras = plt.bar(x, y, color='skyblue', edgecolor='black', alpha=0.8)
-
-        # Escrever valores no topo das barras
-        for xi, yi in zip(x, y):
-            plt.text(xi, yi, str(yi), ha='center', va='bottom', fontsize=8)
-
-        plt.xticks(x, rotation=90)
-        plt.yticks(range(0, max(y) + passo_y, passo_y))
-        plt.title(nome)
-        plt.xlabel('Valor')
-        plt.ylabel('Frequência')
-        plt.grid(axis='y', linestyle='--', alpha=0.4)
-        plt.tight_layout()
-        plt.show()
-
-    def exportarCSV(self, nome_arquivo='estatisticas_completo.csv'):
-        """
-        Exporta todas as estatísticas coletadas para um CSV por rodada,
-        incluindo dados gerais, sorteios e saldos por tipo de apostador.
-
-        Args:
-            nome_arquivo (str): Nome do arquivo CSV a ser gerado.
-        """
-        num_rodadas = len(self.valorApostasRecebidas)
-
-        # Descobre todos os tipos de apostadores
-        tipos_apostadores = sorted(set(self.historicoSaldos.keys()))
-
-        with open(nome_arquivo, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-
-            # Cabeçalho
-            cabecalho = [
-                "Rodada",
-                "Apostas Recebidas",
-                "Prêmios Pagos",
-                "Jogadores Ativos",
-                "Total Apostado",
-                "Total Ganhado",
-                "Prêmio Sorteado",
-                "Número Sorteado"
-            ]
-
-            # Acrescenta colunas por tipo de apostador
-            for tipo in tipos_apostadores:
-                cabecalho.append(f"Saldo Médio ({tipo})")
-            for tipo in tipos_apostadores:
-                cabecalho.append(f"Rodadas até Falha ({tipo})")
-
-            writer.writerow(cabecalho)
-
-            for i in range(num_rodadas):
-                total_apostado = sum(self.historicoApostas[i]) if i < len(self.historicoApostas) else 0
-                total_ganho = self.historicoGanhos[i] if i < len(self.historicoGanhos) else 0
+            
+            valoresApostasSomados = [sum(sublista) for sublista in k.historicoApostas]  # Soma as apostas de cada jogador
+            self.historicoTotalApostajogador.append([f'player{i}', valoresApostasSomados])
 
 
-                premio = self.historicoPremios[i] if i < len(self.historicoPremios) else ''
-                sorteio = self.historicoDeSorteios[i] if i < len(self.historicoDeSorteios) else ''
 
-                linha = [
-                    i + 1,
-                    self.valorApostasRecebidas[i] if i < len(self.valorApostasRecebidas) else 0,
-                    self.valorPremiosPagos[i] if i < len(self.valorPremiosPagos) else 0,
-                    self.historicoJogadoresAtivos[i] if i < len(self.historicoJogadoresAtivos) else 0,
-                    total_apostado,
-                    total_ganho,
-                    premio,
-                    sorteio
-                ]
+        # Aqui, os dados de saldos dos jogadores e da casa são combinados para exibição
+        # Garantimos que a casa seja adicionada de forma que tenha o mesmo formato dos jogadores.
+        # Cada jogador e a casa são apresentados como uma lista onde o primeiro valor é o nome (player0, player1, etc.), 
+        # e o segundo valor é a lista de saldos históricos.
+        
+        print(f"saldos casa {self.historicoSaldosCasa}")
+        
+        
+        saldos_combinados = self.historicoSaldosJogador + [['casa', self.historicoSaldosCasa]]
 
-                # Saldos por tipo até a rodada atual
-                for tipo in tipos_apostadores:
-                    saldos = self.historicoSaldos.get(tipo, [])
-                    media = sum(saldos[:i+1]) / (i+1) if len(saldos) > i else ''
-                    linha.append(round(media, 2) if media != '' else '')
+        # Imprime a lista combinada para depuração
+        #print(saldos_combinados)  # Isso ajudará a verificar se os dados estão corretos.
 
-                # Rodadas até falha por tipo
-                for tipo in tipos_apostadores:
-                    rodadas = self.rodadasAteFalha.get(tipo, [])
-                    media = sum(rodadas[:i+1]) / (i+1) if len(rodadas) > i else ''
-                    linha.append(round(media, 2) if media != '' else '')
-
-                writer.writerow(linha)
-
-        print(f"Arquivo CSV COMPLETO exportado como '{nome_arquivo}'.")
+        # Passa a lista combinada para o método 'linhas()' para gerar o gráfico
+        self.linhas(saldos_combinados)  # Chama o método 'linhas()' para gerar o gráfico com os saldos combinados

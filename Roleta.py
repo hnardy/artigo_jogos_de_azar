@@ -12,13 +12,14 @@ rosa = (6, 30)
 verde = (18, 42)
 vermelho = (54,)
 
-historicoPremios = []  # Histórico de todos os prêmios sorteados
+
 
 
 class Roleta:
     def __init__(self):
         """Inicializa a roleta."""
-        pass
+        self.historicoPremios = []  # Histórico de todos os prêmios sorteados
+        
 
     def girar(self):
         """
@@ -43,45 +44,38 @@ class Roleta:
             str: nome do prêmio correspondente
         """
         if num in x1:
-            historicoPremios.append("1")
+            self.historicoPremios.append("1")
             return "multiplicar por 1"
         
         elif num in x2:
-            historicoPremios.append("2")
+            self.historicoPremios.append("2")
             return "multiplicar por 2"
         
         elif num in x5:
-            historicoPremios.append("5")
+            self.historicoPremios.append("5")
             return "multiplicar por 5"
         
         elif num in x10:
-            historicoPremios.append("10")
+            self.historicoPremios.append("10")
             return "multiplicar por 10"
         
         elif num in azul:
-            historicoPremios.append("azul")
+            self.historicoPremios.append("azul")
             return "prêmio azul"
         
         elif num in rosa:
-            historicoPremios.append("rosa")
+            self.historicoPremios.append("rosa")
             return "prêmio rosa"
         
         elif num in verde:
-            historicoPremios.append("verde")
+            self.historicoPremios.append("verde")
             return "prêmio verde"
         
         elif num in vermelho:
-            historicoPremios.append("vermelho")
+            self.historicoPremios.append("vermelho")
             return "prêmio vermelho"
         
         else:
             return "erro"
 
-    def getHistorico(self):
-        """
-        Retorna a lista com o histórico dos prêmios sorteados.
-
-        Returns:
-            list: lista de strings com prêmios anteriores
-        """
-        return historicoPremios
+    

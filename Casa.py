@@ -2,10 +2,6 @@
 # Mantém históricos de saldo e pagamentos realizados.
 
 class Casa:
-    valorApostasRecebidas = []   # Histórico de valores recebidos em apostas (não está sendo usado)
-    valorPremiosPagos = []       # Histórico de prêmios pagos
-    historicoDeSaldos = []       # Histórico de saldos da casa após cada pagamento
-
     def __init__(self, saldoIncial=0):
         """
         Inicializa a casa com um saldo inicial.
@@ -14,7 +10,9 @@ class Casa:
             saldoIncial (int): saldo inicial da casa (padrão 0)
         """
         self.saldo = saldoIncial
-        self.historicoDeSaldos.append(saldoIncial)
+        self.valorApostasRecebidas = []         # Histórico de valores recebidos em apostas
+        self.valorPremiosPagos = []             # Histórico de prêmios pagos por rodada
+        self.historicoDeSaldos = [saldoIncial]  # Histórico do saldo da casa após cada pagamento
 
     def receberApostas(self, apostas):
         """
@@ -24,34 +22,27 @@ class Casa:
             apostas (int): valor total das apostas recebidas
         """
         self.saldo += apostas
-        # valorApostasRecebidas poderia ser atualizado aqui se desejado
-        # self.valorApostasRecebidas.append(apostas)
+        self.valorApostasRecebidas.append(apostas)
+        # O saldo ainda não é registrado no histórico aqui, pois o pagamento ainda não ocorreu
 
     def pagarPremio(self, premio):
         """
-        Subtrai o valor do prêmio pago do saldo da casa e registra nos históricos.
+        Subtrai o valor do prêmio pago do saldo da casa.
 
         Args:
             premio (int): valor do prêmio a ser pago
         """
         self.saldo -= premio
-        self.valorPremiosPagos.append(premio)
-        self.historicoDeSaldos.append(self.saldo)
+        # Esta função é chamada várias vezes por rodada, então não registra o saldo aqui
+        # O registro de saldo total pago por rodada ocorrerá em deduzirPremio
 
-    def getSaldo(self):
+    def deduzirPremio(self, pot):
         """
-        Retorna o saldo atual da casa.
+        Após pagar todos os jogadores da rodada, registra o valor total pago (pot)
+        e atualiza o histórico de saldos da casa.
 
-        Returns:
-            int: saldo atual
+        Args:
+            pot (int): valor total dos prêmios pagos na rodada
         """
-        return self.saldo
-
-    def getPremiosPagos(self):
-        """
-        Retorna a lista de prêmios pagos até o momento.
-
-        Returns:
-            list[int]: prêmios pagos
-        """
-        return self.valorPremiosPagos
+        self.valorPremiosPagos.append(pot)
+        self.historicoDeSaldos.append(self.saldo)  # Agora sim, saldo já está atualizado
