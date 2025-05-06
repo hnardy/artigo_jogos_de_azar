@@ -45,4 +45,9 @@ class Casa:
             pot (int): valor total dos prêmios pagos na rodada
         """
         self.valorPremiosPagos.append(pot)
-        self.historicoDeSaldos.append(self.saldo)  # Agora sim, saldo já está atualizado
+        self.historicoDeSaldos.append(self.saldo) 
+
+
+    def saldoFinal(self):
+        
+        self.historicoDeSaldos.append(self.saldo)

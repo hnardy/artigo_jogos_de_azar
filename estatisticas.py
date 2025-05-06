@@ -62,11 +62,15 @@ class Estatisticas(Graficos):
     def GraficoSaldosCasaJogador(self):
 
         if self.historicoSaldosJogador == []:
-            print("sem dados")
-            
+            print("sem dados")    
             return
         else:
             print(f"self.tiposJogadores: {self.tiposJogadores}")
             saldos_combinados = self.historicoSaldosJogador + [['casa', self.historicoSaldosCasa]]
+            self.histograma(self.historicoPremios)
             self.linhas(saldos_combinados,"histórico de saldos casa e jogadores")  
             return
+        
+
+   
+        

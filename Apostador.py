@@ -134,8 +134,6 @@ class apostadorAleatorio(ApostadorPadrao):
         return x1, x2, x5, x10, azul, rosa, verde, vermelho
 
 ##################################################################################
-import random  # Adicionar importação para escolha aleatória
-
 class ApostadorEstrategia25(ApostadorPadrao):
 
     def __init__(self, saldo=1000):
@@ -145,11 +143,16 @@ class ApostadorEstrategia25(ApostadorPadrao):
         self.initial_aposta = int(saldo * 0.1)  # 10% do saldo inicial
         self.aposta_atual = self.initial_aposta
         self.ativo = True
+        self.firstTime = True
+
 
     def estaAtivo(self):
         # Desativa se ultrapassar 25% de lucro
         if self.saldo > self.saldo_inicial * 1.25:
             self.ativo = False
+            if (self.firstTime == True):
+                    self.historicoSaldos.append(self.saldo)
+                    self.firstTime = False
         else:
             self.ativo = True
         return self.saldo > 0 and self.ativo
@@ -226,3 +229,126 @@ class ApostadorEstrategia25(ApostadorPadrao):
             self.aposta_atual = self.initial_aposta  # Reset para 10% do saldo inicial após vitória
         else:
             self.aposta_atual *= 2  # Dobra a aposta após derrota
+
+
+
+import random
+
+class ApostadorConservador(ApostadorPadrao):
+
+    def __init__(self, saldo=1000):
+        super().__init__(saldo)
+        self.tipo = "conservador"
+        self.saldo_inicial = saldo
+        self.ativo = True
+        self.firstTime = True
+        # Aposta inicial entre 5% e 10% do saldo atual
+        self.aposta_atual = self.calcular_aposta_inicial()
+
+    def calcular_aposta_inicial(self):
+        return max(1, int(self.saldo * random.uniform(0.05, 0.10)))
+
+    def estaAtivo(self):
+        # Desativa ao atingir 10% de lucro ou se saldo zerar
+        if self.saldo >= self.saldo_inicial * 1.10:
+            self.ativo = False
+            if (self.firstTime == True):
+                self.historicoSaldos.append(self.saldo)
+                self.firstTime = False
+
+        return self.saldo > 0 and self.ativo
+
+    def apostar(self):
+        if self.estaAtivo() and self.saldo >= 1:
+            # Calcula valor da aposta garantindo mínimo 1 e máximo saldo disponível
+            montante = min(self.aposta_atual, self.saldo)
+            montante = max(montante, 1)
+            
+            # Aloca toda a aposta na posição 4 (x1)
+            apostas = [0] * 8
+            apostas[0] = montante
+            
+            # Atualiza saldo
+            self.saldo -= montante
+            self.historicoApostas.append(apostas.copy())
+            self.historicoSaldos.append(self.saldo)
+            return tuple(apostas)
+        
+        self.historicoSaldos.append(self.saldo)
+        return (0, 0, 0, 0, 0, 0, 0, 0)
+
+    def atualizarAposta(self, resultado):
+        if resultado:
+            # Reset para 5-10% do saldo atual após vitória
+            self.aposta_atual = max(1, int(self.saldo * random.uniform(0.05, 0.10)))
+        else:
+            # Dobra a aposta mantendo entre 5-10% do saldo atual
+            doubled = self.aposta_atual * 2
+            min_val = max(1, int(self.saldo * 0.05))
+            max_val = max(1, int(self.saldo * 0.10))
+            self.aposta_atual = min(doubled, max_val)
+            self.aposta_atual = max(self.aposta_atual, min_val)
+
+
+            
+import random
+
+class ApostadorArrojado(ApostadorPadrao):
+
+    def __init__(self, saldo=1000):
+        super().__init__(saldo)
+        self.tipo = "arrojado"
+        self.saldo_inicial = saldo
+        # Começa com 10% do saldo, mas em cada perda dobra sem nunca voltar ao original
+        self.aposta_atual = max(1, int(saldo * 0.1))
+        self.ativo = True
+        self.firstTime= True
+
+    def estaAtivo(self):
+        # Fica inativo ao dobrar o saldo inicial (100% de lucro)
+        if self.saldo >= self.saldo_inicial * 2:
+            self.ativo = False
+            if (self.firstTime == True):
+                self.historicoSaldos.append(self.saldo)
+                self.firstTime = False
+
+        return self.saldo > 0 and self.ativo
+
+    def apostar(self):
+        self.historicoSaldos.append(self.saldo)
+
+        if not self.estaAtivo() or self.saldo < 1:
+            return (0,)*8
+
+        # Define limites garantidos
+        min_p = max(1, int(self.saldo * 0.1))
+        max_p = max(1, int(self.saldo * 0.3))
+        # Se max menor que min, corrige
+        if max_p < min_p:
+            max_p = min_p
+
+        # Montante é a aposta atual, mas dentro dos limites e do que sobra no saldo
+        montanteAposta = min(max(self.aposta_atual, min_p), max_p, self.saldo)
+
+        apostas = [0]*8
+
+        if montanteAposta < 5:
+            # Se não dá para distribuir entre 5 casas, joga tudo no x10
+            apostas[3] = montanteAposta
+        else:
+            # Divide igualmente entre x10, azul, rosa, verde, vermelho (índices 3-7)
+            parte, resto = divmod(montanteAposta, 5)
+            for i in range(3, 8):
+                apostas[i] = parte
+            for i in range(resto):
+                apostas[3 + i] += 1
+
+        total_apostado = sum(apostas)
+        self.saldo -= total_apostado
+        self.historicoApostas.append(apostas.copy())
+        return tuple(apostas)
+
+    def atualizarAposta(self, resultado):
+        if not resultado:
+            # Dobra a aposta atual, sem redução posterior
+            self.aposta_atual *= 2

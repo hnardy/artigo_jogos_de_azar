@@ -1,4 +1,3 @@
-
 from Roleta import *
 from Apostas import *
 from Apostador import *
@@ -27,6 +26,8 @@ def finalizar():
 def limparTerminal():
     os.system('cls')  # limpa o terminal no início da execução
 
+
+
 # Atalho para reiniciar
 keyboard.add_hotkey('space', reset)
 keyboard.add_hotkey('esc', finalizar)
@@ -47,9 +48,11 @@ e1 = Estatisticas()  # armazena e processa dados
 # controle de progresso
 #taskbar = 0  # progresso da execução (para debug)
 
+
+
 # controles de jogo
 iteracoes = 1  # quantidade de jogos (1 por padrão)
-numJogadores = 1              # quantidade de jogadores
+numJogadores = 10  # quantidade de jogadores
 rodadas = 300 #quantidade de jogos
 # histórico de jogadores ativos armazena [iteração, ativos]
 historicoJogadoresAtivos = []
@@ -66,9 +69,13 @@ for j in range(0, iteracoes):
     jogadores = []
     for j in range(0, numJogadores):
         # aqui devem ser implementadas diferentes estratégias 
-        jogadores.append(ApostadorPadrao())
+        
+
+        #jogadores.append(ApostadorPadrao())
         jogadores.append(apostadorAleatorio())
-        jogadores.append(ApostadorEstrategia25())
+        #jogadores.append(ApostadorConservador())
+        #jogadores.append(ApostadorEstrategia25())
+        #jogadores.append(ApostadorArrojado())
 
     # iniciar jogos
     for i in range(0, rodadas):  # 300 é um número de segurança para evitar estratégias imortais
@@ -97,18 +104,20 @@ for j in range(0, iteracoes):
             c1.receberApostas(sum(ap))  # informa a casa de apostas quanto ela recebeu do jogador
 
             premio = a1.aposta(*ap, giro[0])  # calcula o prêmio
-         
             player.receberPremio(premio)  # paga o jogador 
             c1.pagarPremio(premio)  # informa a casa de aposta quanto ela pagou ao jogador
         
             pot.append(premio)#atualizar saldo na casa
         c1.deduzirPremio(sum(pot))
 
- 
+
+    
+
     # Exportar dados ao final da iteração
     e1.coletarDados(jogadores,c1,r1)
 
     e1.GraficoSaldosCasaJogador()
+     
     # Após coletar todos os dados ao longo das iterações, gerar gráficos ou relatórios
 
 

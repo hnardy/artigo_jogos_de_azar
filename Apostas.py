@@ -23,6 +23,7 @@ class Apostas:
         - Valor do prêmio correspondente à aposta vencedora.
         """
 
+
         if sorteado == "multiplicar por 1":
             premio = x1 + x1 * 1
             return premio
