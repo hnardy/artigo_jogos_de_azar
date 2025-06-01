@@ -91,8 +91,21 @@ class apostadorAleatorio(ApostadorPadrao):
         self.historicoApostas=[]    # Guarda todas as apostas realizadas
         self.historicoSaldos =[saldo]    # Guarda o saldo antes de cada aposta                                   
         self.saldo = saldo          #saldo variavel
+        self.saldo_inicial = saldo
+        self.firstTime = True
         self.tipo = "aleatorio"
 
+
+    def estaAtivo(self):
+    # Desativa se ultrapassar 100% de lucro
+        if self.saldo > self.saldo_inicial * 2:
+            self.ativo = False
+            if (self.firstTime == True):
+                    self.historicoSaldos.append(self.saldo)
+                    self.firstTime = False
+        else:
+            self.ativo = True
+        return self.saldo > 0 and self.ativo
 
 
 
@@ -130,8 +143,11 @@ class apostadorAleatorio(ApostadorPadrao):
 
         self.historicoApostas.append([x1, x2, x5, x10, azul, rosa, verde, vermelho])
         self.historicoSaldos.append(self.saldo)
-        print(f'apostas aleatórias {x1, x2, x5, x10, azul, rosa, verde, vermelho}')
+#        print(f'apostas aleatórias {x1, x2, x5, x10, azul, rosa, verde, vermelho}')
         return x1, x2, x5, x10, azul, rosa, verde, vermelho
+
+
+
 
 ##################################################################################
 class ApostadorEstrategia25(ApostadorPadrao):
@@ -230,7 +246,7 @@ class ApostadorEstrategia25(ApostadorPadrao):
         else:
             self.aposta_atual *= 2  # Dobra a aposta após derrota
 
-
+############################################################################################################
 
 import random
 
@@ -290,7 +306,7 @@ class ApostadorConservador(ApostadorPadrao):
             self.aposta_atual = max(self.aposta_atual, min_val)
 
 
-            
+############################################################################################################           
 import random
 
 class ApostadorArrojado(ApostadorPadrao):
@@ -352,3 +368,5 @@ class ApostadorArrojado(ApostadorPadrao):
         if not resultado:
             # Dobra a aposta atual, sem redução posterior
             self.aposta_atual *= 2
+
+#########################################################################################################

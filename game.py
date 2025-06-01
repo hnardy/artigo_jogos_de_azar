@@ -1,136 +1,127 @@
-from Roleta import *
-from Apostas import *
-from Apostador import *
-from Casa import *
-from Estatisticas import *
-import time 
-import os
-import sys
-import keyboard
-
+from Roleta import *               # Módulo para gerenciar a roleta e sorteios
+from Apostas import *              # Módulo para processar apostas e calcular prêmios
+from Apostador import *            # Módulo com implementações de estratégias de apostadores
+from Casa import *                 # Módulo para gerenciar o caixa da casa
+from Estatisticas import *         # Módulo para coletar e exportar dados estatísticos
+import time                        # Para medição de tempo de execução
+import os                          # Para operações de sistema e limpeza de terminal
+import sys                         # Para finalização e reinício do programa
+import keyboard                    # Para captura de atalhos de teclado
 
 def reset():
+    """Reinicia o programa executando novamente o script 'game.py'."""
     limparTerminal()
     python = sys.executable
     script_path = os.path.join(os.path.dirname(__file__), 'game.py')  # caminho absoluto para 'game.py'
     os.execl(python, python, script_path)  # reinicia com 'game.py'
 
-# Finalizar programa
 def finalizar():
+    """Finaliza o programa exibindo o tempo total de execução."""
     fim = time.time() - inicio
     print(f"tempo de execução {fim:.2f} segundos")
     print("finalizado")        
     sys.exit()
 
-
 def limparTerminal():
+    """Limpa o console/terminal."""
     os.system('cls')  # limpa o terminal no início da execução
 
+# Configurar atalhos de teclado
+#keyboard.add_hotkey('space', reset)    # Espaço: reinicia o programa
+#keyboard.add_hotkey('esc', finalizar)  # Esc: finaliza o programa
 
-
-# Atalho para reiniciar
-keyboard.add_hotkey('space', reset)
-keyboard.add_hotkey('esc', finalizar)
-
-
-# inicia o timer da execução
+# Iniciar contagem de tempo global
 inicio = time.time()
-limparTerminal()
 
+# =============================================================================
+#                       CONFIGURAÇÕES DE SIMULAÇÃO
+# =============================================================================
+iteracoes = 100000         # Quantidade total de simulações a serem executadas
+numJogadores = 1         # Quantidade de jogadores por simulação
+rodadas = 300            # Quantidade máxima de rodadas por simulação
+# =============================================================================
 
-# iniciar objetos
-r1 = Roleta()  # sorteia números
-a1 = Apostas()  # processa apostas
-c1 = Casa()  # simula a banca da casa
-e1 = Estatisticas()  # armazena e processa dados
-
-
-# controle de progresso
-#taskbar = 0  # progresso da execução (para debug)
-
-
-
-# controles de jogo
-iteracoes = 1  # quantidade de jogos (1 por padrão)
-numJogadores = 10  # quantidade de jogadores
-rodadas = 300 #quantidade de jogos
-# histórico de jogadores ativos armazena [iteração, ativos]
+# Lista para histórico de jogadores ativos (não utilizado no código atual)
 historicoJogadoresAtivos = []
 
-# quantidade de iterações
+# Loop principal de simulações
 for j in range(0, iteracoes):
-     
-    # Exibir progresso a cada 1% (para debug)
-    #if j % (iteracoes / 100) == 0:  
-    #    print(f'task {j // (iteracoes / 100):.0f}%')
-    #    print(f'tempo decorrido {time.time() - inicio:.2f}s')
+# =========================================================================
+#               INICIALIZAÇÃO DE OBJETOS PARA CADA SIMULAÇÃO
+# =========================================================================
+    r1 = Roleta()        # Controla sorteios da roleta
+    a1 = Apostas()       # Processa cálculos de apostas e prêmios
+    c1 = Casa()          # Gerencia o caixa da casa (banca)
+    e1 = Estatisticas()  # Coleta dados estatísticos da simulação
 
-    # definir jogadores
+    # Exibir progresso a cada 1% das iterações
+    if j % (iteracoes / 100) == 0: 
+        limparTerminal() 
+        print(f'task {j // (iteracoes / 100):.0f}%')
+        print(f'tempo decorrido {time.time() - inicio:.2f}s')
+
+# =========================================================================
+#                      CONFIGURAÇÃO DOS JOGADORES
+# =========================================================================
     jogadores = []
-    for j in range(0, numJogadores):
-        # aqui devem ser implementadas diferentes estratégias 
-        
+    # Adiciona diferentes estratégias de apostadores
+    for _ in range(0, numJogadores):
+        jogadores.append(ApostadorPadrao())        # Estratégia padrão
+        jogadores.append(apostadorAleatorio())     # Estratégia aleatória
+        jogadores.append(ApostadorConservador())   # Estratégia conservadora
+        jogadores.append(ApostadorEstrategia25())  # Estratégia de 25% de lucro
+        jogadores.append(ApostadorArrojado())      # Estratégia arrojada
+       
 
-        #jogadores.append(ApostadorPadrao())
-        jogadores.append(apostadorAleatorio())
-        #jogadores.append(ApostadorConservador())
-        #jogadores.append(ApostadorEstrategia25())
-        #jogadores.append(ApostadorArrojado())
-
-    # iniciar jogos
-    for i in range(0, rodadas):  # 300 é um número de segurança para evitar estratégias imortais
-        # listar jogadores ativos
-        jogadoresAtivos = []
-        for at in jogadores:
-            if at.estaAtivo():  
-                jogadoresAtivos.append(at)  # apenas jogadores ativos farão apostas
+ # =========================================================================
+                     # EXECUÇÃO DAS RODADAS
+ # =========================================================================
+    for i in range(0, rodadas):
+        # Identificar jogadores ativos (com saldo positivo)
+        jogadoresAtivos = [at for at in jogadores if at.estaAtivo()]
         
-        # se não houver jogadores ativos
+        # Encerrar simulação se não houver jogadores ativos
         if not jogadoresAtivos:
             break
 
-        # apostar
-        apostados = []  # recebe as apostas dos jogadores ativos
+        # Coletar apostas dos jogadores
+        apostados = []
         for player in jogadoresAtivos:
-            ap = player.apostar()  # o jogador faz a aposta
-            apostados.append((player, ap))  # guardamos os dados do jogador e aposta feita
+            ap = player.apostar()
+            apostados.append((player, ap))
 
-        # sortear
+        # Realizar sorteio
         giro = r1.girar()
     
-        # conferir e pagar
-        pot = []#saldo pago pela casa
+        # Processar prêmios
+        pot = []
         for player, ap in apostados:
-            c1.receberApostas(sum(ap))  # informa a casa de apostas quanto ela recebeu do jogador
+            # Registrar aposta na casa
+            c1.receberApostas(sum(ap))
 
-            premio = a1.aposta(*ap, giro[0])  # calcula o prêmio
-            player.receberPremio(premio)  # paga o jogador 
-            c1.pagarPremio(premio)  # informa a casa de aposta quanto ela pagou ao jogador
+            # Calcular prêmio
+            premio = a1.aposta(*ap, giro[0])
+            
+            # Pagar prêmio ao jogador
+            player.receberPremio(premio)
+            
+            # Registrar pagamento na casa
+            c1.pagarPremio(premio)
         
-            pot.append(premio)#atualizar saldo na casa
+            # Acumular valor total de prêmios
+            pot.append(premio)
+        
+        # Atualizar saldo da casa
         c1.deduzirPremio(sum(pot))
 
-
+# ========================================================================
+                    # COLETA E EXPORTAÇÃO DE DADOS
+#=========================================================================
+    e1.coletarDados(jogadores, c1, r1)
+    #e1.GraficoSaldosCasaJogador()
+    #e1.exportar_csv() 
+    e1.exportar_mysql()
     
-
-    # Exportar dados ao final da iteração
-    e1.coletarDados(jogadores,c1,r1)
-
-    e1.GraficoSaldosCasaJogador()
-     
-    # Após coletar todos os dados ao longo das iterações, gerar gráficos ou relatórios
-
-
-
-#e1.exportarCSV(nome_arquivo="relatório")    
-
-
-
-
+    jogadores.clear()
+# Finalizar programa após todas as simulações
 finalizar()
-
-
-
-
-
-

@@ -1,0 +1,6 @@
+id,Jogador,Tipo
+1,player0,padrao
+2,player1,aleatorio
+3,player2,conservador
+4,player3,estratégia dos 25
+5,player4,arrojado

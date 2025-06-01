@@ -6,7 +6,7 @@
       {
         "id": "69e0800e7ae9af9a",
         "type": "tabs",
-        "dimension": 50,
+        "dimension": 31.609808102345415,
         "children": [
           {
             "id": "03e18277cc4a9b8f",
@@ -40,10 +40,14 @@
             "id": "5d9602dc5cb5019e",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "markdown",
+              "state": {
+                "file": "teoria dos jogos.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "teoria dos jogos"
             }
           }
         ],
@@ -52,7 +56,7 @@
       {
         "id": "79d9b4a85eb17758",
         "type": "tabs",
-        "dimension": 50,
+        "dimension": 68.39019189765459,
         "children": [
           {
             "id": "40b78da61a324f81",
@@ -108,6 +112,18 @@
               },
               "icon": "lucide-file",
               "title": "a roleta"
+            }
+          },
+          {
+            "id": "afcc5cd5f46755be",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "Pasted image 20250426202600.png"
+              },
+              "icon": "lucide-image",
+              "title": "Pasted image 20250426202600"
             }
           }
         ],
@@ -258,13 +274,13 @@
   },
   "active": "5d9602dc5cb5019e",
   "lastOpenFiles": [
+    "sobre o projeto.md",
     "a roleta.md",
+    "Pasted image 20250426202600.png",
     "Sem título.canvas",
     "2025-04-26.md",
-    "sobre o projeto.md",
     "jogos de azar.md",
     "roleta.md",
-    "Pasted image 20250426202600.png",
     "notions.md",
     "jogador padrão.md",
     "lista de classes.md",
