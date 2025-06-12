@@ -248,8 +248,8 @@ class ApostadorEstrategia25(ApostadorPadrao):
 
 ############################################################################################################
 
-import random
 
+import random
 class ApostadorConservador(ApostadorPadrao):
 
     def __init__(self, saldo=1000):
@@ -307,27 +307,24 @@ class ApostadorConservador(ApostadorPadrao):
 
 
 ############################################################################################################           
-import random
 
+import random
 class ApostadorArrojado(ApostadorPadrao):
 
     def __init__(self, saldo=1000):
         super().__init__(saldo)
         self.tipo = "arrojado"
         self.saldo_inicial = saldo
-        # Começa com 10% do saldo, mas em cada perda dobra sem nunca voltar ao original
         self.aposta_atual = max(1, int(saldo * 0.1))
         self.ativo = True
-        self.firstTime= True
+        self.firstTime = True
 
     def estaAtivo(self):
-        # Fica inativo ao dobrar o saldo inicial (100% de lucro)
         if self.saldo >= self.saldo_inicial * 2:
             self.ativo = False
-            if (self.firstTime == True):
+            if self.firstTime:
                 self.historicoSaldos.append(self.saldo)
                 self.firstTime = False
-
         return self.saldo > 0 and self.ativo
 
     def apostar(self):
@@ -336,23 +333,21 @@ class ApostadorArrojado(ApostadorPadrao):
         if not self.estaAtivo() or self.saldo < 1:
             return (0,)*8
 
-        # Define limites garantidos
         min_p = max(1, int(self.saldo * 0.1))
         max_p = max(1, int(self.saldo * 0.3))
-        # Se max menor que min, corrige
         if max_p < min_p:
             max_p = min_p
 
-        # Montante é a aposta atual, mas dentro dos limites e do que sobra no saldo
         montanteAposta = min(max(self.aposta_atual, min_p), max_p, self.saldo)
-
         apostas = [0]*8
 
+        # Lógica ajustada: saldo 1 aposta no azul (índice 5)
         if montanteAposta < 5:
-            # Se não dá para distribuir entre 5 casas, joga tudo no x10
-            apostas[3] = montanteAposta
+            if self.saldo == 1:  # Condição especial para saldo = 1
+                apostas[5] = montanteAposta
+            else:
+                apostas[3] = montanteAposta
         else:
-            # Divide igualmente entre x10, azul, rosa, verde, vermelho (índices 3-7)
             parte, resto = divmod(montanteAposta, 5)
             for i in range(3, 8):
                 apostas[i] = parte
@@ -366,7 +361,6 @@ class ApostadorArrojado(ApostadorPadrao):
 
     def atualizarAposta(self, resultado):
         if not resultado:
-            # Dobra a aposta atual, sem redução posterior
             self.aposta_atual *= 2
 
 #########################################################################################################

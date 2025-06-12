@@ -36,7 +36,7 @@ inicio = time.time()
 # =============================================================================
 #                       CONFIGURAÇÕES DE SIMULAÇÃO
 # =============================================================================
-iteracoes = 100000         # Quantidade total de simulações a serem executadas
+iteracoes = 1       # Quantidade total de simulações a serem executadas
 numJogadores = 1         # Quantidade de jogadores por simulação
 rodadas = 300            # Quantidade máxima de rodadas por simulação
 # =============================================================================
@@ -120,8 +120,11 @@ for j in range(0, iteracoes):
     e1.coletarDados(jogadores, c1, r1)
     #e1.GraficoSaldosCasaJogador()
     #e1.exportar_csv() 
-    e1.exportar_mysql()
-    
+    #e1.exportar_mysql()
+    print(e1.historicoSaldosJogador)
     jogadores.clear()
+
+
+
 # Finalizar programa após todas as simulações
 finalizar()

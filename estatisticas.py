@@ -64,6 +64,7 @@ class Estatisticas(Graficos):
             self.historicoTotalApostajogador.append([f'player{i}', valoresApostasSomados])
 
 
+
     def GraficoSaldosCasaJogador(self):
 
         if self.historicoSaldosJogador == []:
@@ -226,17 +227,11 @@ class Estatisticas(Graficos):
 
 
 
-    def exportar_mysql(self, host = 'localhost', user = 'root', password = '', database ='jogosdeazar', port=3306):
+
+
+    def exportar_mysql(self, host='localhost', user='root', password='', database='jogosdeazar', port=3306):
         """
-        Exporta todos os dados para tabelas MySQL pré-existentes.
-        Usa INSERT IGNORE para evitar erros de duplicata nas tabelas com restrições UNIQUE.
-        
-        Args:
-            host (str): Endereço do servidor MySQL
-            user (str): Usuário do banco de dados
-            password (str): Senha do banco de dados
-            database (str): Nome do banco de dados
-            port (int): Porta do MySQL (padrão 3306)
+        Exporta todos os dados para o banco MySQL com estrutura relacional completa
         """
         conn = None
         try:
@@ -250,124 +245,170 @@ class Estatisticas(Graficos):
             )
             cursor = conn.cursor()
             
-            # 1. Tabela dados_gerais_casa
-            dados = []
-            for i in range(len(self.historicoPremios)):
-                dados.append((
-                    i + 1,
-                    str(self.historicoPremios[i]),
-                    float(self.valorApostasRecebidas[i]),
-                    float(self.valorPremiosPagos[i]),
-                    float(self.historicoSaldosCasa[i])
-                ))
+            # 1. Tabela historico_premios
+            dados = [(i+1, premio) for i, premio in enumerate(self.historicoPremios)]
             if dados:
                 query = """
-                INSERT IGNORE INTO dados_gerais_casa 
-                    (rodada, premio, apostas_recebidas, premios_pagos, saldo_casa) 
-                VALUES (%s, %s, %s, %s, %s)
-                """
-                cursor.executemany(query, dados)
-            
-            # 2. Tabela tipos_jogadores
-            dados = []
-            for jogador in self.tiposJogadores:
-                dados.append((jogador[0], jogador[1]))
-            if dados:
-                query = """
-                INSERT IGNORE INTO tipos_jogadores 
-                    (jogador, tipo) 
+                INSERT IGNORE INTO historico_premios (rodada, premio)
                 VALUES (%s, %s)
                 """
                 cursor.executemany(query, dados)
             
-            # 3. Tabela historico_ganhos_jogadores
-            dados = []
-            for jogador in self.historicoGanhosJogador:
-                jogador_id = jogador[0]
-                for rodada, ganho in enumerate(jogador[1]):
-                    dados.append((jogador_id, rodada + 1, float(ganho)))
+            # 2. Tabela valor_apostas_recebidas
+            dados = [(i+1, valor) for i, valor in enumerate(self.valorApostasRecebidas)]
             if dados:
                 query = """
-                INSERT IGNORE INTO historico_ganhos_jogadores 
-                    (jogador, rodada, ganho) 
+                INSERT IGNORE INTO valor_apostas_recebidas (rodada, valor)
+                VALUES (%s, %s)
+                """
+                cursor.executemany(query, dados)
+            
+            # 3. Tabela valor_premios_pagos
+            dados = [(i+1, valor) for i, valor in enumerate(self.valorPremiosPagos)]
+            if dados:
+                query = """
+                INSERT IGNORE INTO valor_premios_pagos (rodada, valor)
+                VALUES (%s, %s)
+                """
+                cursor.executemany(query, dados)
+            
+            # 4. Tabela historico_saldos_casa
+            dados = [(i+1, saldo) for i, saldo in enumerate(self.historicoSaldosCasa)]
+            if dados:
+                query = """
+                INSERT IGNORE INTO historico_saldos_casa (rodada, saldo)
+                VALUES (%s, %s)
+                """
+                cursor.executemany(query, dados)
+            
+            # 5. Tabela tipos_jogadores (base para relacionamentos)
+            dados = [(jogador[0], jogador[1]) for jogador in self.tiposJogadores]
+            if dados:
+                query = """
+                INSERT IGNORE INTO tipos_jogadores (jogador, tipo)
+                VALUES (%s, %s)
+                """
+                cursor.executemany(query, dados)
+            
+            # 6. Tabela historico_ganhos_jogador
+            dados = []
+            for jogador_data in self.historicoGanhosJogador:
+                jogador = jogador_data[0]
+                for rodada, ganho in enumerate(jogador_data[1]):
+                    dados.append((jogador, rodada+1, ganho))
+            if dados:
+                query = """
+                INSERT IGNORE INTO historico_ganhos_jogador (jogador, rodada, ganho)
                 VALUES (%s, %s, %s)
                 """
                 cursor.executemany(query, dados)
             
-            # 4. Tabela historico_apostas_jogadores
+            # 7. Tabela historico_apostas_jogador
             dados = []
-            for jogador in self.historicoApostasJogador:
-                jogador_id = jogador[0]
-                for rodada, apostas in enumerate(jogador[1]):
-                    # Convertendo para float e garantindo a ordem correta
-                    apostas_float = [float(val) for val in apostas]
+            for jogador_data in self.historicoApostasJogador:
+                jogador = jogador_data[0]
+                for rodada, apostas in enumerate(jogador_data[1]):
                     dados.append((
-                        jogador_id, 
-                        rodada + 1, 
-                        apostas_float[0],  # x1
-                        apostas_float[1],  # x2
-                        apostas_float[2],  # x5
-                        apostas_float[3],  # x10
-                        apostas_float[4],  # azul
-                        apostas_float[5],  # rosa
-                        apostas_float[6],  # verde
-                        apostas_float[7]   # vermelho
+                        jogador,
+                        rodada+1,
+                        apostas[0],  # x1
+                        apostas[1],  # x2
+                        apostas[2],  # x5
+                        apostas[3],  # x10
+                        apostas[4],  # azul
+                        apostas[5],  # rosa
+                        apostas[6],  # verde
+                        apostas[7]   # vermelho
                     ))
             if dados:
                 query = """
-                INSERT IGNORE INTO historico_apostas_jogadores 
-                    (jogador, rodada, x1, x2, x5, x10, azul, rosa, verde, vermelho) 
+                INSERT IGNORE INTO historico_apostas_jogador 
+                    (jogador, rodada, x1, x2, x5, x10, azul, rosa, verde, vermelho)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 cursor.executemany(query, dados)
             
-            # 5. Tabela historico_saldos_jogadores
+            # 8. Tabela historico_saldos_jogador
             dados = []
-            for jogador in self.historicoSaldosJogador:
-                jogador_id = jogador[0]
-                for rodada, saldo in enumerate(jogador[1]):
-                    dados.append((jogador_id, rodada + 1, float(saldo)))
+            for jogador_data in self.historicoSaldosJogador:
+                jogador = jogador_data[0]
+                for rodada, saldo in enumerate(jogador_data[1]):
+                    dados.append((jogador, rodada+1, saldo))
             if dados:
                 query = """
-                INSERT IGNORE INTO historico_saldos_jogadores 
-                    (jogador, rodada, saldo) 
+                INSERT IGNORE INTO historico_saldos_jogador (jogador, rodada, saldo)
                 VALUES (%s, %s, %s)
                 """
                 cursor.executemany(query, dados)
             
-            # 6. Tabela rodadas_ativas_jogadores
-            dados = []
-            for jogador in self.rodadasVivoJogador:
-                dados.append((jogador[0], int(jogador[1])))
+            # 9. Tabela rodadas_vivo_jogador
+            dados = [(jogador[0], jogador[1]) for jogador in self.rodadasVivoJogador]
             if dados:
                 query = """
-                INSERT IGNORE INTO rodadas_ativas_jogadores 
-                    (jogador, rodadas_ativas) 
+                INSERT IGNORE INTO rodadas_vivo_jogador (jogador, rodadas_vivo)
                 VALUES (%s, %s)
                 """
                 cursor.executemany(query, dados)
             
-            # 7. Tabela total_apostado_jogadores
+            # 10. Tabela historico_total_apostas_jogador
             dados = []
-            for jogador in self.historicoTotalApostajogador:
-                jogador_id = jogador[0]
-                for rodada, total in enumerate(jogador[1]):
-                    dados.append((jogador_id, rodada + 1, float(total)))
+            for jogador_data in self.historicoTotalApostajogador:
+                jogador = jogador_data[0]
+                for rodada, total in enumerate(jogador_data[1]):
+                    dados.append((jogador, rodada+1, total))
             if dados:
                 query = """
-                INSERT IGNORE INTO total_apostado_jogadores 
-                    (jogador, rodada, total_apostado) 
+                INSERT IGNORE INTO historico_total_apostas_jogador (jogador, rodada, total_apostado)
                 VALUES (%s, %s, %s)
                 """
                 cursor.executemany(query, dados)
-            
-            # 8. Tabela ultimo_saldo_casa
-            ultimo_saldo = float(self.historicoSaldosCasa[-1]) if self.historicoSaldosCasa else 0.0
-            query = "INSERT INTO ultimo_saldo_casa (saldo) VALUES (%s)"
-            cursor.execute(query, (ultimo_saldo,))
-            
+
+
+
+             # 11. Tabela Último Saldo da Casa
+                if self.historicoSaldosCasa:
+                    ultimo_saldo = self.historicoSaldosCasa[-1]
+                else:
+                    ultimo_saldo = 0
+
+                dados = [(ultimo_saldo,)]
+
+                query = """
+                INSERT INTO ultimo_saldo_casa (saldo)
+                VALUES (%s)
+                """
+                cursor.executemany(query, dados)
+
+
+            # 12. Tabela Último Saldo por Jogador por Rodada
+            dados = []
+
+            # Determinar a rodada atual (baseado no histórico da casa)
+            rodada_atual = len(self.historicoSaldosCasa) if self.historicoSaldosCasa else 0
+
+            # Processar cada jogador
+            for jogador_info in self.historicoSaldosJogador:
+                nome_jogador = jogador_info[0]
+                saldos = jogador_info[1]
+                
+                # Obter último saldo do jogador
+                ultimo_saldo = saldos[-1] if saldos else 0
+                
+                # Adicionar à lista de dados
+                dados.append((rodada_atual, nome_jogador, ultimo_saldo))
+
+            # Inserir no banco de dados
+            if dados:
+                query = """
+                INSERT INTO ultimo_saldo_jogador (rodada, jogador, saldo)
+                VALUES (%s, %s, %s)
+                """
+                cursor.executemany(query, dados)            
+
+
+
             conn.commit()
-            return "Dados exportados com sucesso para o MySQL"
+            return "Dados exportados com sucesso para todas as tabelas MySQL!"
         
         except Error as e:
             print(f"Erro MySQL: {e}")
